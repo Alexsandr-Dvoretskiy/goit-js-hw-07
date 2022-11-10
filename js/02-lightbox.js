@@ -1,22 +1,38 @@
 import { galleryItems } from './gallery-items.js';
 
-const galleryRef = document.querySelector('.gallery');
+const galleryContainer = document.querySelector('.gallery');
+const galleryMarkup = createGalleryMarkup(galleryItems);
 
-const getItemMarkup = ({ preview, original, description }) => `
-  <a class="gallery__item" href="${original}">
-    <img class="gallery__image" src="${preview}" alt="${description}" />
-  </a>
-`;
-const getImagesMarkup = images => images.map(it => getItemMarkup(it)).join('');
+galleryContainer.insertAdjacentHTML('beforeend', galleryMarkup);
 
-galleryRef.innerHTML = getImagesMarkup(galleryItems);
-galleryRef.addEventListener('click', onClickGallery);
+galleryContainer.addEventListener('click', onOpenModalImageClick);
 
-new window.SimpleLightbox('.gallery a', {
-  captionDelay: 250,
-  captionsData: 'alt',
-});
-
-function onClickGallery(e) {
-  e.preventDefault();
+function createGalleryMarkup(galleryItems) {
+  return galleryItems
+    .map(({ preview, original, description }) => {
+      return `
+    <div class="gallery__item">
+    <a class="gallery__link" href="${original}">
+    <img
+    class="gallery__image"
+    src="${preview}"
+    alt="${description}"
+    />
+    </a>
+    </div>`;
+    })
+    .join('');
 }
+
+function onOpenModalImageClick(e) {
+  e.preventDefault();
+
+  if (e.target.nodeName !== 'IMG') {
+    return;
+  }
+}
+const gallery = new SimpleLightbox('.gallery a', {
+  captionsData: 'alt',
+  captionPosition: 'bottom',
+  captionDelay: 250,
+});
